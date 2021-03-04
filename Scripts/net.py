@@ -1,12 +1,19 @@
 from __future__ import print_function
 import argparse
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import dataloader
+
+import torchvision
 from torchvision import transforms
+
 import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 from torch.utils import data
+
+import dataset
 
 # 链接 https://blog.csdn.net/liyaohhh/article/details/50614380
 # SPPLayer其实就是一个灵活的多层次的 Pool
@@ -88,6 +95,7 @@ class Net(nn.Module):
 
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
+    torch.no_grad()
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
@@ -107,7 +115,7 @@ def train(args, model, device, train_loader, optimizer, epoch):
                 break
 
 
-def test(model, device, test_loader):
+def _test(model, device, test_loader):
     model.eval()
     test_loss = 0
     correct = 0
@@ -150,10 +158,9 @@ def main():
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
     args = parser.parse_args()
+
     use_cuda = not args.no_cuda and torch.cuda.is_available()
-
     torch.manual_seed(args.seed)        # 设置种子数，参数初始化一致
-
     device = torch.device("cuda" if use_cuda else "cpu")
 
     train_kwargs = {'batch_size': args.batch_size}
@@ -161,34 +168,37 @@ def main():
     if use_cuda:
         cuda_kwargs = {'num_workers': 1,
                        'pin_memory': True,
-                       'shuffle': True}
+                       'shuffle': True}             # 这个shuffle是batch_size内部shuffle 所以Dataset还是要自己写Shuffle
         train_kwargs.update(cuda_kwargs)
         test_kwargs.update(cuda_kwargs)
 
-    transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-        ])
+    # Dataset那里使用
+    # transform=transforms.Compose([
+    #     transforms.ToTensor(),
+    #     transforms.Normalize((0.1307,), (0.3081,))
+    #     ])
 
+
+    # -------------------      Dataset      -----------------------
+    # TODO 无法打乱
+    train_dataset = dataset.TorchDataset("../images/train/Shuffle_Data.txt")
+    test_dataset = dataset.TorchDataset("../images/test/Shuffle_Data.txt")
+    # test_dataset = torchvision.datasets.ImageFolder(root="../images/test", transform=transform)
     # TODO
-    dataset1 = datasets.MNIST('../data', train=True, download=True,
-                       transform=transform)
-    dataset2 = datasets.MNIST('../data', train=False,
-                       transform=transform)
-    # TODO
+    train_loader = torch.utils.data.DataLoader(train_dataset, **train_kwargs)
+    test_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
 
-    train_loader = torch.utils.data.DataLoader(dataset1,**train_kwargs)
-    test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
 
+    # --------------------    Model + optimizer  --------------------
     model = Net().to(device)
     # optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    scheduler = StepLR(optimizer, step_size=5000, gamma=args.gamma)    # TODO 衰减速度
 
-
-    scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)    # TODO 衰减速度
+    # ----------------------  train and test  ------------------------
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
-        test(model, device, test_loader)
+        _test(model, device, test_loader)
         scheduler.step()
 
     if args.save_model:
@@ -197,10 +207,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
 
 
 

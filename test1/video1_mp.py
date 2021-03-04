@@ -38,7 +38,7 @@ def process_video(group_number):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default="01_02.mp4", type=str)
+    parser.add_argument("--input", default="../SYSU/prist/00001.mp4", type=str)
     parser.add_argument("--output", default="images1", type=str)
     args = parser.parse_args()
     input = args.input
