@@ -69,21 +69,12 @@ def all_split():
         print("--- processing prist: {}".format(i))
         if i < 40:
             process_video(prist_dir + "/" + videos[i], output_dir + "/train/prist")
-        elif i < 50:
-            process_video(prist_dir + "/" + videos[i], output_dir + "/valid/prist")
-        else:
-            process_video(prist_dir + "/" + videos[i], output_dir + "/test/prist")
-        i += 1
-
-    videos = os.listdir(forged_dir)
-    i = 0
-    while i < 100:
-        print("--- processing forged: {}".format(i))
-        if i < 40:
             extract_forge_img(forged_dir + "/" + videos[i], output_dir + "/train/forged")
         elif i < 50:
+            process_video(prist_dir + "/" + videos[i], output_dir + "/valid/prist")
             extract_forge_img(forged_dir + "/" + videos[i], output_dir + "/valid/forged")
         else:
+            process_video(prist_dir + "/" + videos[i], output_dir + "/test/prist")
             extract_forge_img(forged_dir + "/" + videos[i], output_dir + "/test/forged")
         i += 1
 
