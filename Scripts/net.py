@@ -208,7 +208,6 @@ def main():
     torch.backends.cudnn.enabled = True
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
     model = Net()
-    model = model.half()
     model = nn.DataParallel(model)
     model = model.to(device)
     if os.path.exists("VideoFake_cnn.pt"):
