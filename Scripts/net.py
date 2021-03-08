@@ -204,6 +204,7 @@ def main():
     torch.cuda.empty_cache()
 
     # --------------------    Model + optimizer  --------------------
+    torch.backends.cudnn.benchmark = True
     torch.backends.cudnn.enabled = True
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
     model = Net()
