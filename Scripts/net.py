@@ -131,7 +131,6 @@ def valid(model, device, test_loader):
     with torch.no_grad():
         for data, target in test_loader:
             data, target = data.to(device), target.to(device, dtype=torch.int64)
-            data = data.half()
             output = model(data)
             loss1 = F.nll_loss(output[0], target)
             loss2 = F.nll_loss(output[1], target)
