@@ -138,7 +138,8 @@ def valid(model, device, test_loader):
             loss3 = F.nll_loss(output[2], target)
             loss = loss1 + loss2 + 0.1 * loss3
             test_loss += loss  # sum up batch loss
-            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            pred = output[0].argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            print(pred)
             correct += pred.eq(target.view_as(pred)).sum().item()
             del loss1, loss2, loss3, loss
 
