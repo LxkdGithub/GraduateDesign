@@ -159,7 +159,7 @@ def main():
     parser = argparse.ArgumentParser(description='PyTorch')
     parser.add_argument('--batch-size', type=int, default=32, metavar='N',
                         help='input batch size for training (default: 64)')
-    parser.add_argument('--test-batch-size', type=int, default=100, metavar='N',
+    parser.add_argument('--valid-batch-size', type=int, default=100, metavar='N',
                         help='input batch size for testing (default: 1000)')
     parser.add_argument('--epochs', type=int, default=14, metavar='N',
                         help='number of epochs to train (default: 14)')
@@ -202,8 +202,8 @@ def main():
     # -------------------      Dataset      -----------------------
     # TODO 无法打乱
     train_dataset = dataset.TorchDataset("../images/train/Shuffle_Data.txt")
-    test_dataset = dataset.TorchDataset("../images/test/Shuffle_Data.txt")
-    # test_dataset = torchvision.datasets.ImageFolder(root="../images/test", transform=transform)
+    test_dataset = dataset.TorchDataset("../images/valid/Shuffle_Data.txt")
+    # test_dataset = torchvision.datasets.ImageFolder(root="../images/valid", transform=transform)
     # TODO
     train_loader = torch.utils.data.DataLoader(train_dataset, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
@@ -221,7 +221,7 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = StepLR(optimizer, step_size=5000, gamma=args.gamma)    # TODO 衰减速度
 
-    # ----------------------  train and test  ------------------------
+    # ----------------------  train and valid  ------------------------
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
         torch.cuda.empty_cache()

@@ -58,7 +58,7 @@ class CreateList:
 
 def all_process():
     train_data = CreateList(os.path.abspath("../images/train"))
-    test_data = CreateList(os.path.abspath("../images/test"))
+    test_data = CreateList(os.path.abspath("../images/valid"))
     train_data.create()
     train_data.detail()
     train_data.shuffle()
@@ -69,7 +69,7 @@ def all_process():
 if __name__ == "__main__":
     # parser = argparse.ArgumentParser("Shuffle")
     # parser.add_argument('--train_root', type=str, default="../images/train")
-    # parser.add_argument('--test_root', type=str, default="../images/test")
+    # parser.add_argument('--test_root', type=str, default="../images/valid")
     # args = parser.parse_args()
     # print("-----------------" + os.path.abspath(args.root))
     # data_all = CreateList(os.path.abspath(args.root))
