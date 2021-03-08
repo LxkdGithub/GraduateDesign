@@ -59,34 +59,25 @@ def extract_forge_img(video_path, output):
     vid.release()
 
 
-def all_split(begin):
-    begin = (begin-1)*10+1
+def all_split():
     prist_dir = "../SYSU/prist"
     forged_dir = "../SYSU/forged"
     output_dir = "../images"
     videos = os.listdir(prist_dir)
     i = 1
     for video in videos:
-        if i < begin:
-            i += 1
-            continue
         print("--- processing prist: {}".format(i))
-        if i < 40:
+        if i <= 40:
             process_video(prist_dir + "/" + video, output_dir + "/train/prist")
-        elif i < 50:
+        elif i <= 50:
             process_video(prist_dir + "/" + video, output_dir + "/valid/prist")
         else:
             process_video(prist_dir + "/" + video, output_dir + "/test/prist")
         i += 1
-        if i >= (begin+20):
-            break
 
     videos = os.listdir(forged_dir)
     i = 1
     for video in videos:
-        if i < begin:
-            i += 1
-            continue
         print("--- processing forged: {}".format(i))
         if i <= 40:
             extract_forge_img(forged_dir + "/" + video, output_dir + "/train/forged")
@@ -95,8 +86,6 @@ def all_split(begin):
         else:
             extract_forge_img(forged_dir + "/" + video, output_dir + "/test/forged")
         i += 1
-        if i >= (begin+10):
-            break
 
 
 if __name__ == "__main__":
@@ -110,8 +99,8 @@ if __name__ == "__main__":
     # process_video(args.input1, args.output+"/train/prist")
     # extract_forge_img(args.input2, args.output+"/train/forged")
 
-    p = mp.Pool(10)
-    p.map(all_split, range(1, 11))
+    all_split()
+
     print(
         "------------Time taken:{}------------".format(time.time() - start_time)
     )
