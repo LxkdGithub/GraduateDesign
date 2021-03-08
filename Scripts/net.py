@@ -1,5 +1,6 @@
 from __future__ import print_function
 import argparse
+import os
 
 import torch
 import torch.nn as nn
@@ -29,13 +30,15 @@ class SSPLayer(nn.Module):
         bs, c, h, w = x.size()
         pooling_layers = []
         for i in range(self.num_layers):
-            kernel_size = h // (2 ** i)
+            h_kernel_size = h // (2 ** i)
+            w_kernel_size = w // (2 ** i)
             if self.pool_type == "max_pool":
-                tensor = F.max_pool2d(x, kernel_size=kernel_size, stride=kernel_size).view(bs, -1)
+                tensor = F.max_pool2d(x, kernel_size=(h_kernel_size, w_kernel_size), stride=(h_kernel_size, w_kernel_size)).view(bs, -1)
             else:
-                tensor = F.avg_pool2d(x, kernel_size=kernel_size, stride=kernel_size).view(bs, -1)
+                tensor = F.avg_pool2d(x, kernel_size=(h_kernel_size, w_kernel_size), stride=(h_kernel_size, w_kernel_size)).view(bs, -1)
             pooling_layers.append(tensor)
-        torch.cat(pooling_layers, 1)
+        print("SSP Layer: ",torch.cat(pooling_layers, 1).size())
+        return torch.cat(pooling_layers, 1)
 
 
 
@@ -58,17 +61,17 @@ class Net(nn.Module):
         self.conv5 = nn.Conv2d(512, 512, 3)     # 78 x 43 -> 76 x 41
         self.pool5 = nn.MaxPool2d(2, 2)         # 76 x 41 -> 38 x 20
         # SSP Layer(大小不确定)
-        self.SSP_layer = SSPLayer(3)            # 1 + 4 + 16 (1*1 + 2*2 + 4*4) = 21 pixels
-        self.fc_conv1 = nn.Linear(512*21, 2)
+        self.SSP_layer = SSPLayer(2)            # 1 + 4 + 16 (1*1 + 2*2 + 4*4) = 21 pixels
+        self.fc_conv1 = nn.Linear(512*5, 2)
 
         # L-Net - 1
         self.conv6 = nn.Conv2d(512, 512, 1)     # 78 x 43 -> 78 x 43
         self.pool6 = nn.AdaptiveMaxPool2d(1)    # 78 x 43 -> 1 x 1
-        self.fc_conv2 = nn.Conv2d(512*1*1, 2, 1)
+        self.fc_conv2 = nn.Linear(512*1*1, 2)
 
         # L-Net - 2
         self.pool7 = nn.AdaptiveAvgPool2d(1)    # 78 x 43 -> 1 x 1
-        self.fc_conv3 = nn.Conv2d(512*1*1, 2, 1)
+        self.fc_conv3 = nn.Linear(512*1*1, 2)
 
 
     def forward(self, x):
@@ -79,32 +82,37 @@ class Net(nn.Module):
 
         # G-Net
         g = self.pool5(F.relu(self.conv5(x)))
+        g = self.SSP_layer(g)
         g = self.fc_conv1(g)
 
         # L-Net
-        l = F.relu(self.conv6(x))
-        l1 = self.fc_conv2(self.pool6(l))
-        l2 = self.fc_conv3(self.pool7(l))
+        l = F.relu(self.conv6(x), inplace=True)
+        l1 = self.pool6(l)
+        l1 = l1.view(l1.shape[0], -1)
+        l1 = self.fc_conv2(l1)
+        l2 = self.pool7(l)
+        l2 = l2.view(l2.shape[0], -1)
+        l2 = self.fc_conv3(l2)
 
         # softmax
-        g_r = F.softmax(g)
-        l1_r = F.softmax(l1)
-        l2_r = F.softmax(l2)
+        g_r = nn.LogSoftmax(dim=1)(g)
+        l1_r = nn.LogSoftmax(dim=1)(l1)
+        l2_r = nn.LogSoftmax(dim=1)(l2)
 
-        return g, l1, l2
+        return g_r, l1_r, l2_r
 
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
-    torch.no_grad()
     for batch_idx, (data, target) in enumerate(train_loader):
-        data, target = data.to(device), target.to(device)
+        data, target = data.to(device), target.to(device, dtype=torch.int64)
         optimizer.zero_grad()
         output = model(data)
+        # print(output)
         # TODO  怎么学习(只要不是直接setp()了，就无所谓)
         loss1 = F.nll_loss(output[0], target)
         loss2 = F.nll_loss(output[1], target)
         loss3 = F.nll_loss(output[2], target)
-        loss = loss1 + loss2 + 0.1 * loss3 
+        loss = loss1 + loss2 + 0.1 * loss3
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
@@ -115,15 +123,19 @@ def train(args, model, device, train_loader, optimizer, epoch):
                 break
 
 
-def _test(model, device, test_loader):
+def valid(model, device, test_loader):
     model.eval()
     test_loss = 0
     correct = 0
     with torch.no_grad():
         for data, target in test_loader:
-            data, target = data.to(device), target.to(device)
+            data, target = data.to(device), target.to(device, dtype=torch.int64)
             output = model(data)
-            test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
+            loss1 = F.nll_loss(output[0], target)
+            loss2 = F.nll_loss(output[1], target)
+            loss3 = F.nll_loss(output[2], target)
+            loss = loss1 + loss2 + 0.1 * loss3
+            test_loss += loss  # sum up batch loss
             pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
 
@@ -188,21 +200,23 @@ def main():
     train_loader = torch.utils.data.DataLoader(train_dataset, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
 
+    torch.cuda.empty_cache()
 
     # --------------------    Model + optimizer  --------------------
     model = Net().to(device)
-    # optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
+    if os.path.exists("VideoFake_cnn.pt"):
+        model.load_state_dict("VideoFake_cnn.pt")
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = StepLR(optimizer, step_size=5000, gamma=args.gamma)    # TODO 衰减速度
 
     # ----------------------  train and test  ------------------------
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
-        _test(model, device, test_loader)
+        torch.cuda.empty_cache()
+        valid(model, device, test_loader)
         scheduler.step()
-
-    if args.save_model:
-        torch.save(model.state_dict(), "VideoFake_cnn.pt")
+        if args.save_model:
+            torch.save(model.state_dict(), "VideoFake_cnn.pt")
 
 
 if __name__ == '__main__':
