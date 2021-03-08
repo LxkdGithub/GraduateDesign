@@ -203,7 +203,9 @@ def main():
     torch.cuda.empty_cache()
 
     # --------------------    Model + optimizer  --------------------
-    model = Net().to(device)
+    model = Net()
+    model = nn.DataParallel(model)
+    model = model.to(device)
     if os.path.exists("VideoFake_cnn.pt"):
         model.load_state_dict("VideoFake_cnn.pt")
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
