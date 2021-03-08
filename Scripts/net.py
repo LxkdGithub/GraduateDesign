@@ -178,7 +178,7 @@ def main():
     train_kwargs = {'batch_size': args.batch_size}
     test_kwargs = {'batch_size': args.test_batch_size}
     if use_cuda:
-        cuda_kwargs = {'num_workers': 0,
+        cuda_kwargs = {'num_workers': 3,
                        'pin_memory': True,
                        'shuffle': True}             # 这个shuffle是batch_size内部shuffle 所以Dataset还是要自己写Shuffle
         train_kwargs.update(cuda_kwargs)
