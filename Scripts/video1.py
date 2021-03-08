@@ -64,27 +64,27 @@ def all_split():
     forged_dir = "../SYSU/forged"
     output_dir = "../images"
     videos = os.listdir(prist_dir)
-    i = 1
-    for video in videos:
+    i = 0
+    while i < 100:
         print("--- processing prist: {}".format(i))
-        if i <= 40:
-            process_video(prist_dir + "/" + video, output_dir + "/train/prist")
-        elif i <= 50:
-            process_video(prist_dir + "/" + video, output_dir + "/valid/prist")
+        if i < 40:
+            process_video(prist_dir + "/" + videos[i], output_dir + "/train/prist")
+        elif i < 50:
+            process_video(prist_dir + "/" + videos[i], output_dir + "/valid/prist")
         else:
-            process_video(prist_dir + "/" + video, output_dir + "/test/prist")
+            process_video(prist_dir + "/" + videos[i], output_dir + "/test/prist")
         i += 1
 
     videos = os.listdir(forged_dir)
-    i = 1
-    for video in videos:
+    i = 0
+    while i < 100:
         print("--- processing forged: {}".format(i))
-        if i <= 40:
-            extract_forge_img(forged_dir + "/" + video, output_dir + "/train/forged")
-        elif i <= 50:
-            extract_forge_img(forged_dir + "/" + video, output_dir + "/valid/forged")
+        if i < 40:
+            extract_forge_img(forged_dir + "/" + videos[i], output_dir + "/train/forged")
+        elif i < 50:
+            extract_forge_img(forged_dir + "/" + videos[i], output_dir + "/valid/forged")
         else:
-            extract_forge_img(forged_dir + "/" + video, output_dir + "/test/forged")
+            extract_forge_img(forged_dir + "/" + videos[i], output_dir + "/test/forged")
         i += 1
 
 
