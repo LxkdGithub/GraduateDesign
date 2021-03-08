@@ -19,7 +19,7 @@ def process_video(video_path, output):
     ret, frame = vid.read()
     proc_frames = 0
     while ret:
-        output_file = output + "\\" + video_id + "-{:0>6d}.png".format(proc_frames)
+        output_file = output + "/" + video_id + "-{:0>6d}.png".format(proc_frames)
         cv2.imwrite(output_file, frame)
         ret, frame = vid.read()
         proc_frames += 1
@@ -51,7 +51,7 @@ def extract_forge_img(video_path, output):
 
     while ret:
         if (idxs[0] <= proc_frames <= idxs[1]) or (idxs[0] <= proc_frames <= idxs[1]):
-            output_file = output + "\\" + str(video_id) + "-{:0>6d}.png".format(proc_frames)
+            output_file = output + "/" + str(video_id) + "-{:0>6d}.png".format(proc_frames)
             cv2.imwrite(output_file, frame)
         ret, frame = vid.read()
         proc_frames += 1

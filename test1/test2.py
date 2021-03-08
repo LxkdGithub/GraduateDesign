@@ -15,6 +15,15 @@ def test1():
     cv2.imshow("delta3", delta3)
     cv2.waitKey(0)
 
+def test2():
+    video_path = "../SYSU/forged/00002_080-194.mp4"
+    camera = cv2.VideoCapture(video_path)
+    (ret1, frame1) = camera.read()
+    (ret2, frame2) = camera.read()
+    img = cv2.subtract(frame1, frame2)
+    cv2.imshow("img", img)
+    cv2.waitKey(0)
+
 
 if __name__ == "__main__":
-    test1()
+    test2()
