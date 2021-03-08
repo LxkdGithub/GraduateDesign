@@ -75,13 +75,13 @@ class Net(nn.Module):
 
 
     def forward(self, x):
-        x = self.pool1(F.relu(self.conv1(x)))
-        x = self.pool2(F.relu(self.conv2(x)))
-        x = self.pool3(F.relu(self.conv3(x)))
-        x = self.pool4(F.relu(self.conv4(x)))
+        x = self.pool1(F.relu(self.conv1(x), inplace=True))
+        x = self.pool2(F.relu(self.conv2(x), inplace=True))
+        x = self.pool3(F.relu(self.conv3(x), inplace=True))
+        x = self.pool4(F.relu(self.conv4(x), inplace=True))
 
         # G-Net
-        g = self.pool5(F.relu(self.conv5(x)))
+        g = self.pool5(F.relu(self.conv5(x), inplace=True))
         g = self.SSP_layer(g)
         g = self.fc_conv1(g)
 
