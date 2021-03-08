@@ -203,6 +203,7 @@ def main():
     torch.cuda.empty_cache()
 
     # --------------------    Model + optimizer  --------------------
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
     model = Net()
     model = nn.DataParallel(model)
     model = model.to(device)
