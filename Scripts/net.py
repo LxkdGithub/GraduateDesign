@@ -144,7 +144,6 @@ def valid(model, device, test_loader):
             print(output[2][0])
             print(output_merge[0])
             pred = output_merge.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
-            print(pred)
             correct += pred.eq(target.view_as(pred)).sum().item()
             del loss1, loss2, loss3, loss
 
