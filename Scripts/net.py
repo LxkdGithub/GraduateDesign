@@ -217,7 +217,7 @@ def main():
     # ----------------------  train and test  ------------------------
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
-        # torch.cuda.empty_cache()
+        torch.cuda.empty_cache()
         valid(model, device, test_loader)
         scheduler.step()
         if args.save_model:
