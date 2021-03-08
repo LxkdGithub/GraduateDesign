@@ -5,7 +5,7 @@ import numpy as np
 
 
 class TorchDataset(Dataset):
-    def __init__(self, filename, resize_height=540, resize_width=960, repeat=1):
+    def __init__(self, filename, resize_height=360, resize_width=640, repeat=1):
         '''
         :param filename: 数据文件TXT：格式：imge_name.jpg label1_id labe2_id
         :param image_dir: 图片路径：image_dir+imge_name.jpg构成图片的完整路径
