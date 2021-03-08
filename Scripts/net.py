@@ -98,6 +98,7 @@ class Net(nn.Module):
         g_r = nn.LogSoftmax(dim=1)(g)
         l1_r = nn.LogSoftmax(dim=1)(l1)
         l2_r = nn.LogSoftmax(dim=1)(l2)
+        del x, g, l, l1, l2
 
         return g_r, l1_r, l2_r
 
