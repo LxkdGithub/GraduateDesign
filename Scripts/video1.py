@@ -60,6 +60,7 @@ def extract_forge_img(video_path, output):
 
 
 def all_split(begin):
+    begin = (begin-1)*10+1
     prist_dir = "../SYSU/prist"
     forged_dir = "../SYSU/forged"
     output_dir = "../images"
@@ -110,8 +111,7 @@ if __name__ == "__main__":
     # extract_forge_img(args.input2, args.output+"/train/forged")
 
     p = mp.Pool(10)
-    for i in range(1, 11):
-        p.map(all_split, (i-1)*10+1)
+    p.map(all_split, range(1, 11))
     print(
         "------------Time taken:{}------------".format(time.time() - start_time)
     )

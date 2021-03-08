@@ -1,5 +1,6 @@
 import cv2
 import os
+import multiprocessing as mp
 
 def test1():
     origin1 = cv2.imread("../images/valid/prist/00002-000081.png")
@@ -26,7 +27,13 @@ def test2():
 
 
 def test3():
-    pass
+    p = mp.Pool(4)
+    p.map(test4, range(10))
+
+
+def test4(i):
+    print(i)
+
 
 if __name__ == "__main__":
     test3()
