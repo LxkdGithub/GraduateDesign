@@ -178,7 +178,7 @@ def main():
     train_kwargs = {'batch_size': args.batch_size}
     test_kwargs = {'batch_size': args.test_batch_size}
     if use_cuda:
-        cuda_kwargs = {'num_workers': 1,
+        cuda_kwargs = {'num_workers': 2,
                        'pin_memory': True,
                        'shuffle': True}             # 这个shuffle是batch_size内部shuffle 所以Dataset还是要自己写Shuffle
         train_kwargs.update(cuda_kwargs)
@@ -215,7 +215,7 @@ def main():
     # ----------------------  train and test  ------------------------
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
-        torch.cuda.empty_cache()
+        # torch.cuda.empty_cache()
         valid(model, device, test_loader)
         scheduler.step()
         if args.save_model:
