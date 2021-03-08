@@ -6,7 +6,7 @@ import cv2
 
 class CreateList:
     def __init__(self, root):
-        self.DataFile = root
+        self.DataFile = os.path.abspath(root).replace("\\", "\\\\", 1)
         self.s = []
         self.label = {}
         self.label_num = {}

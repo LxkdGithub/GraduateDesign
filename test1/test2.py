@@ -25,5 +25,8 @@ def test2():
     cv2.waitKey(0)
 
 
+def test3():
+    pass
+
 if __name__ == "__main__":
-    test2()
+    test3()
