@@ -65,24 +65,30 @@ def all_split():
     videos = os.listdir(prist_dir)
     i = 0
     for video in videos:
-        if i < 1:
+        print("--- processing prist: {}".format(i))
+        if i < 40:
             process_video(prist_dir + "/" + video, output_dir + "/train/prist")
+        elif i < 50:
+            process_video(prist_dir + "/" + video, output_dir + "/valid/prist")
         else:
             process_video(prist_dir + "/" + video, output_dir + "/test/prist")
         i += 1
-        if i == 2:
-            break
+        # if i == 2:
+        #     break
 
     videos = os.listdir(forged_dir)
     i = 0
     for video in videos:
-        if i < 1:
+        print("--- processing forged: {}".format(i))
+        if i < 40:
             extract_forge_img(forged_dir + "/" + video, output_dir + "/train/forged")
+        elif i < 50:
+            extract_forge_img(forged_dir + "/" + video, output_dir + "/valid/forged")
         else:
             extract_forge_img(forged_dir + "/" + video, output_dir + "/test/forged")
         i += 1
-        if i == 2:
-            break
+        # if i == 2:
+        #     break
 
 
 if __name__ == "__main__":
