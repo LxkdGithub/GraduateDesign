@@ -64,7 +64,9 @@ def all_split():
     forged_dir = "../SYSU/forged"
     output_dir = "../images"
     videos = os.listdir(prist_dir)
+    videos.sort(key=lambda x: int(x[:5]))
     videos_forged = os.listdir(forged_dir)
+    videos_forged.sort(key=lambda x: int(x[:5]))
     i = 0
     while i < 10:
         print("--- processing : {}".format(i))
