@@ -26,14 +26,17 @@ def test2():
     cv2.waitKey(0)
 
 
-def test3():
-    p = mp.Pool(4)
-    p.map(test4, range(10))
-
-
-def test4(i):
-    print(i)
+def test4():
+    prist_dir = "../SYSU/prist"
+    forged_dir = "../SYSU/forged"
+    output_dir = "../images"
+    videos = os.listdir(prist_dir)
+    videos_forged = os.listdir(forged_dir)
+    # print(videos)
+    # print(videos_forged)
+    for video in videos:
+        print(video)
 
 
 if __name__ == "__main__":
-    test3()
+    test4()
