@@ -216,7 +216,7 @@ def main():
     model = Net()
     model = nn.DataParallel(model)
     model = model.to(device)
-    if args.load-model and os.path.exists("VideoFake_cnn.pt"):
+    if args.load_model and os.path.exists("VideoFake_cnn.pt"):
         model.load_state_dict(torch.load("VideoFake_cnn.pt"))
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = StepLR(optimizer, step_size=5000, gamma=args.gamma)    # TODO 衰减速度
