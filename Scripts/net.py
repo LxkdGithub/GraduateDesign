@@ -175,6 +175,8 @@ def main():
                         help='random seed (default: 1)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                         help='how many batches to wait before logging training status')
+    parser.add_argument('--load-model', action='store_true', default=False,
+                        help='For Loading the current Model')
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
     args = parser.parse_args()
@@ -200,13 +202,11 @@ def main():
 
 
     # -------------------      Dataset      -----------------------
-    # TODO 无法打乱
     train_dataset = dataset.TorchDataset("../images/train/Shuffle_Data.txt")
-    test_dataset = dataset.TorchDataset("../images/valid/Shuffle_Data.txt")
+    valid_dataset = dataset.TorchDataset("../images/valid/Shuffle_Data.txt")
     # test_dataset = torchvision.datasets.ImageFolder(root="../images/valid", transform=transform)
-    # TODO
     train_loader = torch.utils.data.DataLoader(train_dataset, **train_kwargs)
-    test_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
+    valid_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
 
     torch.cuda.empty_cache()
 
@@ -216,7 +216,7 @@ def main():
     model = Net()
     model = nn.DataParallel(model)
     model = model.to(device)
-    if os.path.exists("VideoFake_cnn.pt"):
+    if args.load-model and os.path.exists("VideoFake_cnn.pt"):
         model.load_state_dict(torch.load("VideoFake_cnn.pt"))
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = StepLR(optimizer, step_size=5000, gamma=args.gamma)    # TODO 衰减速度
