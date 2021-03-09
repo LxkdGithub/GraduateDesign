@@ -6,14 +6,14 @@ import numpy as np
 
 class TorchDataset(Dataset):
     def __init__(self, filename, resize_height=360, resize_width=640, repeat=1):
-        '''
+        """
         :param filename: 数据文件TXT：格式：imge_name.jpg label1_id labe2_id
         :param image_dir: 图片路径：image_dir+imge_name.jpg构成图片的完整路径
         :param resize_height 为None时，不进行缩放
         :param resize_width  为None时，不进行缩放，
                               PS：当参数resize_height或resize_width其中一个为None时，可实现等比例缩放
         :param repeat: 所有样本数据重复次数，默认循环一次，当repeat为None时，表示无限循环<sys.maxsize
-        '''
+        """
         self.image_label_list = []
         self.read_file(filename)
         self.len = len(self.image_label_list)
@@ -58,14 +58,14 @@ class TorchDataset(Dataset):
                 self.image_label_list.append((name, labels))
 
     def load_data(self, path, resize_height, resize_width, normalization):
-        '''
+        """
         加载数据
         :param path:
         :param resize_height:
         :param resize_width:
         :param normalization: 是否归一化
         :return:
-        '''
+        """
         image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
         image = cv2.resize(image, (resize_width, resize_height))
         return image
