@@ -45,7 +45,7 @@ def extract_forge_img(video_path, output):
     idxs[1] = int(idx_str[4:7])
     if len(idx_str) > 7:
         idxs[2] = int(idx_str[8:11])
-        idxs[3]= int(idx_str[12:])
+        idxs[3] = int(idx_str[12:])
     vid = cv2.VideoCapture(video_path)
     ret, frame = vid.read()
     proc_frames = 0
@@ -70,14 +70,10 @@ def all_split():
     i = 0
     while i < 100:
         print("--- processing : {}".format(i))
-        if i < 40:
+        if i < 50:
             print("=======", videos[i], videos_forged[i])
             process_video(prist_dir + "/" + videos[i], output_dir + "/train/prist")
             extract_forge_img(forged_dir + "/" + videos_forged[i], output_dir + "/train/forged")
-        elif i < 50:
-            print("=======", videos[i], videos_forged[i])
-            process_video(prist_dir + "/" + videos[i], output_dir + "/valid/prist")
-            extract_forge_img(forged_dir + "/" + videos_forged[i], output_dir + "/valid/forged")
         else:
             print("=======", videos[i], videos_forged[i])
             process_video(prist_dir + "/" + videos[i], output_dir + "/test/prist")

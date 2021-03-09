@@ -4,12 +4,13 @@ import cv2
 
 
 class CreateList:
-    def __init__(self, root):
+    def __init__(self, root, isTrain):
         self.DataFile = os.path.abspath(root).replace("\\", "\\\\", 1)
         self.s = []
         self.label = {}
         self.label_num = {}
         self.dataNum = 0
+        self.isTrain = isTrain
 
     def create(self):
         files = os.listdir(self.DataFile)
@@ -31,12 +32,22 @@ class CreateList:
         print("-------------------------------------------")
 
     def shuffle(self):
-        shuffle_file = open(self.DataFile + "/Shuffle_Data.txt", "w")
         temp = self.s
         np.random.shuffle(temp)
-        for i in temp:
-            shuffle_file.write(i[0] + " " + str(i[1]) + "\n")
-        return self.DataFile + "/Shuffle_Data.txt"
+        if self.isTrain:
+            shuffle_train_file = open(self.DataFile + "/Shuffle_Train.txt", "w")
+            shuffle_valid_file = open(self.DataFile + "/Shuffle_Valid.txt", "w")
+            temp_valid = temp[40:]
+            temp = temp[:40]
+            for i in temp_valid:
+                shuffle_valid_file.write(i[0] + " " + str(i[1]) + "\n")
+            for i in temp:
+                shuffle_train_file.write(i[0] + " " + str(i[1]) + "\n")
+        else:
+            shuffle_test_file = open(self.DataFile + "/Shuffle_Test.txt", "w")
+            for i in temp:
+                shuffle_test_file.write(i[0] + " " + str(i[1]) + "\n")
+
 
     def get_all(self):
         print(self.s)
@@ -57,14 +68,10 @@ class CreateList:
 
 def all_process():
     train_data = CreateList(os.path.abspath("../images/train"))
-    valid_data = CreateList(os.path.abspath("../images/valid"))
     test_data = CreateList(os.path.abspath("../images/test"))
     train_data.create()
     train_data.detail()
     train_data.shuffle()
-    valid_data.create()
-    valid_data.detail()
-    valid_data.shuffle()
     test_data.create()
     test_data.detail()
     test_data.shuffle()
