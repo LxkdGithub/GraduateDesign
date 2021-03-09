@@ -202,9 +202,9 @@ def main():
 
 
     # -------------------      Dataset      -----------------------
-    train_dataset = dataset.TorchDataset("../images/train/Shuffle_Data.txt")
-    valid_dataset = dataset.TorchDataset("../images/valid/Shuffle_Data.txt")
-    # test_dataset = torchvision.datasets.ImageFolder(root="../images/valid", transform=transform)
+    train_dataset = dataset.TorchDataset("../images/train/Shuffle_Train.txt")
+    valid_dataset = dataset.TorchDataset("../images/train/Shuffle_Valid.txt")
+    # test_dataset = torchvision.datasets.ImageFolder(root="../images/test", transform=transform)
     train_loader = torch.utils.data.DataLoader(train_dataset, **train_kwargs)
     valid_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
 
