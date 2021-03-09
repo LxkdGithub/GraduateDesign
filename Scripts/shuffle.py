@@ -37,7 +37,7 @@ class CreateList:
         if self.isTrain:
             shuffle_train_file = open(self.DataFile + "/Shuffle_Train.txt", "w")
             shuffle_valid_file = open(self.DataFile + "/Shuffle_Valid.txt", "w")
-            valid_num = self.dataNum / 5
+            valid_num = self.dataNum // 5
             temp_valid = temp[:valid_num]
             temp = temp[valid_num:]
             for i in temp_valid:
