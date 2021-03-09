@@ -225,7 +225,7 @@ def main():
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
         torch.cuda.empty_cache()
-        valid(model, device, test_loader)
+        valid(model, device, valid_loader)
         scheduler.step()
         if args.save_model:
             torch.save(model.state_dict(), "VideoFake_cnn.pt")
