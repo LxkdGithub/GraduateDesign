@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import argparse
 import cv2
 
 
@@ -58,22 +57,18 @@ class CreateList:
 
 def all_process():
     train_data = CreateList(os.path.abspath("../images/train"))
-    test_data = CreateList(os.path.abspath("../images/valid"))
+    valid_data = CreateList(os.path.abspath("../images/valid"))
+    test_data = CreateList(os.path.abspath("../images/test"))
     train_data.create()
     train_data.detail()
     train_data.shuffle()
+    valid_data.create()
+    valid_data.detail()
+    valid_data.shuffle()
     test_data.create()
     test_data.detail()
     test_data.shuffle()
 
+
 if __name__ == "__main__":
-    # parser = argparse.ArgumentParser("Shuffle")
-    # parser.add_argument('--train_root', type=str, default="../images/train")
-    # parser.add_argument('--test_root', type=str, default="../images/valid")
-    # args = parser.parse_args()
-    # print("-----------------" + os.path.abspath(args.root))
-    # data_all = CreateList(os.path.abspath(args.root))
-    # data_all.create()
-    # data_all.detail()
-    # data_all.shuffle()
     all_process()
