@@ -37,8 +37,9 @@ class CreateList:
         if self.isTrain:
             shuffle_train_file = open(self.DataFile + "/Shuffle_Train.txt", "w")
             shuffle_valid_file = open(self.DataFile + "/Shuffle_Valid.txt", "w")
-            temp_valid = temp[40:]
-            temp = temp[:40]
+            valid_num = self.dataNum / 5
+            temp_valid = temp[:valid_num]
+            temp = temp[valid_num:]
             for i in temp_valid:
                 shuffle_valid_file.write(i[0] + " " + str(i[1]) + "\n")
             for i in temp:
