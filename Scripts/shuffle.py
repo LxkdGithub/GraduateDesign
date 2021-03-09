@@ -67,8 +67,8 @@ class CreateList:
 
 
 def all_process():
-    train_data = CreateList(os.path.abspath("../images/train"))
-    test_data = CreateList(os.path.abspath("../images/test"))
+    train_data = CreateList(os.path.abspath("../images/train"), True)
+    test_data = CreateList(os.path.abspath("../images/test"), False)
     train_data.create()
     train_data.detail()
     train_data.shuffle()
