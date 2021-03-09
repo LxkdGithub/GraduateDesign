@@ -206,7 +206,7 @@ def main():
     valid_dataset = dataset.TorchDataset("../images/train/Shuffle_Valid.txt")
     # test_dataset = torchvision.datasets.ImageFolder(root="../images/test", transform=transform)
     train_loader = torch.utils.data.DataLoader(train_dataset, **train_kwargs)
-    valid_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
+    valid_loader = torch.utils.data.DataLoader(valid_dataset, **test_kwargs)
 
     torch.cuda.empty_cache()
 
