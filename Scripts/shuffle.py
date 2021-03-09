@@ -77,5 +77,12 @@ def all_process():
     test_data.shuffle()
 
 
+def train_process():
+    train_data = CreateList(os.path.abspath("../images/train"), True)
+    train_data.create()
+    train_data.detail()
+    train_data.shuffle()
+
+
 if __name__ == "__main__":
     all_process()

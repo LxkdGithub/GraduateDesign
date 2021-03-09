@@ -15,6 +15,9 @@ from torch.optim.lr_scheduler import StepLR
 from torch.utils import data
 
 import dataset
+import shuffle
+
+
 
 # 链接 https://blog.csdn.net/liyaohhh/article/details/50614380
 # SPPLayer其实就是一个灵活的多层次的 Pool
@@ -229,6 +232,7 @@ def main():
         scheduler.step()
         if args.save_model:
             torch.save(model.state_dict(), "VideoFake_cnn.pt")
+        shuffle.train_process()
 
 
 if __name__ == '__main__':
