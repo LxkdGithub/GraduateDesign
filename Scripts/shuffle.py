@@ -49,7 +49,6 @@ class CreateList:
             for i in temp:
                 shuffle_test_file.write(i[0] + " " + str(i[1]) + "\n")
 
-
     def get_all(self):
         print(self.s)
 
