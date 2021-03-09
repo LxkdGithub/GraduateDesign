@@ -69,12 +69,15 @@ def all_split():
     while i < 10:
         print("--- processing : {}".format(i))
         if i < 4:
+            print("=======", videos[i], videos_forged[i])
             process_video(prist_dir + "/" + videos[i], output_dir + "/train/prist")
             extract_forge_img(forged_dir + "/" + videos_forged[i], output_dir + "/train/forged")
         elif i < 5:
+            print("=======", videos[i], videos_forged[i])
             process_video(prist_dir + "/" + videos[i], output_dir + "/valid/prist")
             extract_forge_img(forged_dir + "/" + videos_forged[i], output_dir + "/valid/forged")
         else:
+            print("=======", videos[i], videos_forged[i])
             process_video(prist_dir + "/" + videos[i], output_dir + "/test/prist")
             extract_forge_img(forged_dir + "/" + videos_forged[i], output_dir + "/test/forged")
         i += 1
