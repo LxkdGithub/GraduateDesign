@@ -78,7 +78,8 @@ class Net(nn.Module):
 
 
     def forward(self, x):
-        x = self.pool1(F.relu(self.conv1(x), inplace=True))
+        x = F.relu(self.conv1(x), inplace=True)
+        x = self.pool1(x)
         x = self.pool2(F.relu(self.conv2(x), inplace=True))
         x = self.pool3(F.relu(self.conv3(x), inplace=True))
         x = self.pool4(F.relu(self.conv4(x), inplace=True))
@@ -160,15 +161,15 @@ def valid(model, device, test_loader):
 def main():
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch')
-    parser.add_argument('--batch-size', type=int, default=32, metavar='N',
+    parser.add_argument('--batch-size', type=int, default=8, metavar='N',
                         help='input batch size for training (default: 64)')
-    parser.add_argument('--test-batch-size', type=int, default=100, metavar='N',
+    parser.add_argument('--test-batch-size', type=int, default=20, metavar='N',
                         help='input batch size for testing (default: 1000)')
     parser.add_argument('--epochs', type=int, default=14, metavar='N',
                         help='number of epochs to train (default: 14)')
-    parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
+    parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
                         help='learning rate (default: 1.0)')
-    parser.add_argument('--gamma', type=float, default=0.9, metavar='M',
+    parser.add_argument('--gamma', type=float, default=0.95, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='disables CUDA training')
@@ -220,9 +221,10 @@ def main():
     model = nn.DataParallel(model)
     model = model.to(device)
     if args.load_model and os.path.exists("VideoFake_cnn.pt"):
+        print("-------- [Load Model] : from file ---------------")
         model.load_state_dict(torch.load("VideoFake_cnn.pt"))
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
-    scheduler = StepLR(optimizer, step_size=5000, gamma=args.gamma)    # TODO 衰减速度
+    optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
+    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=args.gamma)
 
     # ----------------------  train and valid  ------------------------
     for epoch in range(1, args.epochs + 1):
@@ -232,7 +234,8 @@ def main():
         scheduler.step()
         if args.save_model:
             torch.save(model.state_dict(), "VideoFake_cnn.pt")
-        shuffle.train_process()
+            print("------- [Save Model] ----------")
+        shuffle.split_train_valid(epoch % 5)
 
 
 if __name__ == '__main__':

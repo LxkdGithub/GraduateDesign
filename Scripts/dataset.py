@@ -2,10 +2,11 @@ from torchvision import transforms
 from torch.utils.data import Dataset
 import cv2
 import numpy as np
+import os
 
 
 class TorchDataset(Dataset):
-    def __init__(self, filename, resize_height=360, resize_width=640, repeat=1):
+    def __init__(self, filename, resize_height=720, resize_width=720, repeat=1, isTest=False):
         """
         :param filename: 数据文件TXT：格式：imge_name.jpg label1_id labe2_id
         :param image_dir: 图片路径：image_dir+imge_name.jpg构成图片的完整路径
@@ -20,6 +21,7 @@ class TorchDataset(Dataset):
         self.repeat = repeat
         self.resize_height = resize_height
         self.resize_width = resize_width
+        self.isTest = isTest
 
         # 相关预处理的初始化
         '''class torchvision.transforms.ToTensor'''
@@ -39,7 +41,12 @@ class TorchDataset(Dataset):
         image_path, label = self.image_label_list[index]
         img = self.load_data(image_path, self.resize_height, self.resize_width, normalization=False)
         img = self.data_preproccess(img)
-        return img, np.array(label)
+        if not self.isTest:
+            return img, np.array(label)
+        else:
+            dir_file = os.path.splitext(image_path)[0][-25:-2]
+            return img, np.array(label), dir_file
+
 
     def __len__(self):
         if self.repeat is None:

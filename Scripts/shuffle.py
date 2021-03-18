@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import cv2
+import argparse
 
 
 class CreateList:
@@ -13,7 +14,11 @@ class CreateList:
         self.isTrain = isTrain
 
     def create(self):
-        files = os.listdir(self.DataFile)
+        # files = os.listdir(self.DataFile)
+        if self.isTrain:
+            files = ["prist_crop", "forged_crop"]
+        else:
+            files = ["prist", "forged"]
         for labels in files:
             if os.path.isfile(self.DataFile + "/" + labels):
                 continue
@@ -34,20 +39,10 @@ class CreateList:
     def shuffle(self):
         temp = self.s
         np.random.shuffle(temp)
-        if self.isTrain:
-            shuffle_train_file = open(self.DataFile + "/Shuffle_Train.txt", "w")
-            shuffle_valid_file = open(self.DataFile + "/Shuffle_Valid.txt", "w")
-            valid_num = self.dataNum // 5
-            temp_valid = temp[:valid_num]
-            temp = temp[valid_num:]
-            for i in temp_valid:
-                shuffle_valid_file.write(i[0] + " " + str(i[1]) + "\n")
-            for i in temp:
-                shuffle_train_file.write(i[0] + " " + str(i[1]) + "\n")
-        else:
-            shuffle_test_file = open(self.DataFile + "/Shuffle_Test.txt", "w")
-            for i in temp:
-                shuffle_test_file.write(i[0] + " " + str(i[1]) + "\n")
+        np.random.shuffle(temp)
+        shuffle_file = open(self.DataFile + "/Shuffle.txt", "w")
+        for i in temp:
+            shuffle_file.write(i[0] + " " + str(i[1]) + "\n")
 
     def get_all(self):
         print(self.s)
@@ -66,15 +61,24 @@ class CreateList:
         cv2.waitKey(0)
 
 
-def all_process():
-    train_data = CreateList(os.path.abspath("../images/train"), True)
-    test_data = CreateList(os.path.abspath("../images/test"), False)
-    train_data.create()
-    train_data.detail()
-    train_data.shuffle()
-    test_data.create()
-    test_data.detail()
-    test_data.shuffle()
+def split_train_valid(idx):
+    shuffle_train_file = open("../images/train/Shuffle_Train.txt", "w")
+    shuffle_valid_file = open("../images/train/Shuffle_Valid.txt", "w")
+    shuffle_file = open("../images/train/Shuffle.txt", "r")
+    temp = shuffle_file.readlines()
+    num = len(temp)
+    valid_num = num // 5
+    if idx == 4:
+        temp_valid = temp[-valid_num:]
+        temp_train = temp[:-valid_num]
+    else:
+        temp_valid = temp[valid_num*idx:valid_num*(idx+1)]
+        temp_train = temp[:valid_num*idx] + temp[valid_num*(idx+1):]
+        temp = temp[valid_num:]
+    for i in temp_valid:
+        shuffle_valid_file.write(i)
+    for i in temp_train:
+        shuffle_train_file.write(i)
 
 
 def train_process():
@@ -84,5 +88,24 @@ def train_process():
     train_data.shuffle()
 
 
+def test_process(train_mode):
+    test_data = CreateList(os.path.abspath("../images/test"), train_mode)
+    test_data.create()
+    test_data.detail()
+    test_data.shuffle()
+
+
 if __name__ == "__main__":
-    all_process()
+    parser = argparse.ArgumentParser("Shuffle")
+    parser.add_argument("--train", action="store_true")
+    parser.add_argument("--test", action="store_true")
+    parser.add_argument("--train-mode", action="store_true")
+    args = parser.parse_args()
+    if args.train:
+        print("train")
+        train_process()
+        split_train_valid(0)
+    if args.test:
+        print("test")
+        print(args.train_mode)
+        test_process(args.train_mode)
