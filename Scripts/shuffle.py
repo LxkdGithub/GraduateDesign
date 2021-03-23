@@ -16,14 +16,14 @@ class CreateList:
     def create(self):
         # files = os.listdir(self.DataFile)
         if self.isTrain:
-            files = ["prist_crop", "forged_crop"]
+            files = ["prist_crop", "forged_crop", "prist_crop_aug", "forged_crop_aug"]
         else:
             files = ["prist", "forged"]
         for labels in files:
             if os.path.isfile(self.DataFile + "/" + labels):
                 continue
             tempData = os.listdir(self.DataFile + "/" + labels)
-            self.label[labels] = len(self.label)  # label start from 0
+            self.label[labels] = len(self.label) % 2 # label start from 0
             self.label_num[labels] = len(tempData)
             for img in tempData:
                 self.dataNum += 1

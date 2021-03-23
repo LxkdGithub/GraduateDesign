@@ -73,7 +73,7 @@ def test(model, device, test_loader):
     precision = TP / (TP + FP)
     recall = TP / (TP +FN)
 
-
+    print(TP, TN, FP, FN)
     print(accuracy, precision, recall)
 
     test_loss /= total
@@ -84,7 +84,9 @@ def test(model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         test_loss, TP+TN, total/3,
         300. * (TP+TN) / total))
-    print('--- Precision: {}  --- Reacll: {}'.format(accuracy, recall))
+    print('--- Accuracy: {} --  Precision: {}  --- Reacll: {}'.format(accuracy, precision, recall))
+    with open("accuracy.txt", "a+") as file:
+        file.write('--- Accuracy: {} --  Precision: {}  --- Reacll: {}\n'.format(accuracy, precision, recall))
 
 
 if __name__ == "__main__":
@@ -93,7 +95,7 @@ if __name__ == "__main__":
     torch.cuda.empty_cache()
     model = torch.nn.DataParallel(model)
     model.to(device)
-    model.load_state_dict(torch.load("VideoFake_cnn-317-2.pt"))
+    model.load_state_dict(torch.load("VideoFake_cnn-10.pt"))
 
     test_kwargs = {'batch_size': 30,
                    'num_workers': 3,
@@ -102,7 +104,7 @@ if __name__ == "__main__":
     test_dataset = dataset.TorchDataset(
         "../images/test/Shuffle.txt",
         resize_height=720, resize_width=720,
-        isTest=True,
+        mode=2,
     )
     test_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
     test(model, device, test_loader)

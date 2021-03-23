@@ -64,8 +64,8 @@ class Net(nn.Module):
         self.conv5 = nn.Conv2d(512, 512, 3)     # 78 x 43 -> 76 x 41
         self.pool5 = nn.MaxPool2d(2, 2)         # 76 x 41 -> 38 x 20
         # SSP Layer(大小不确定)
-        self.SSP_layer = SSPLayer(2)            # 1 + 4 + 16 (1*1 + 2*2 + 4*4) = 21 pixels
-        self.fc_conv1 = nn.Linear(512*5, 2)
+        self.SSP_layer = SSPLayer(3)            # 1 + 4 + 16 (1*1 + 2*2 + 4*4) = 21 pixels
+        self.fc_conv1 = nn.Linear(512*21, 2)
 
         # L-Net - 1
         self.conv6 = nn.Conv2d(512, 512, 1)     # 78 x 43 -> 78 x 43
@@ -117,7 +117,8 @@ def train(args, model, device, train_loader, optimizer, epoch):
         loss1 = F.nll_loss(output[0], target)
         loss2 = F.nll_loss(output[1], target)
         loss3 = F.nll_loss(output[2], target)
-        loss = loss1 + loss2 + 0.1 * loss3
+        loss = loss1 * 0.45 + loss2 * 0.45 + 0.1 * loss3
+        # print(output[0][0:5], "\n", output[1][0:5], "\n", output[2][0:5])
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
@@ -167,9 +168,9 @@ def main():
                         help='input batch size for testing (default: 1000)')
     parser.add_argument('--epochs', type=int, default=14, metavar='N',
                         help='number of epochs to train (default: 14)')
-    parser.add_argument('--lr', type=float, default=0.001, metavar='LR',
+    parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                         help='learning rate (default: 1.0)')
-    parser.add_argument('--gamma', type=float, default=0.95, metavar='M',
+    parser.add_argument('--gamma', type=float, default=0.90, metavar='M',
                         help='Learning rate step gamma (default: 0.7)')
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='disables CUDA training')
@@ -182,6 +183,8 @@ def main():
     parser.add_argument('--load-model', action='store_true', default=False,
                         help='For Loading the current Model')
     parser.add_argument('--save-model', action='store_true', default=False,
+                        help='For Saving the current Model')
+    parser.add_argument('--epoch-num', type=int, default=1,
                         help='For Saving the current Model')
     args = parser.parse_args()
 
@@ -220,20 +223,23 @@ def main():
     model = Net()
     model = nn.DataParallel(model)
     model = model.to(device)
-    if args.load_model and os.path.exists("VideoFake_cnn.pt"):
+    if args.load_model and os.path.exists("VideoFake_cnn-{}.pt".format(args.epoch_num-1)):
         print("-------- [Load Model] : from file ---------------")
-        model.load_state_dict(torch.load("VideoFake_cnn.pt"))
+        model.load_state_dict(torch.load("VideoFake_cnn-{}.pt".format(args.epoch_num-1)))
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=args.gamma)
 
     # ----------------------  train and valid  ------------------------
+    print(args.epoch_num)
     for epoch in range(1, args.epochs + 1):
+        if epoch < args.epoch_num:
+            continue
         train(args, model, device, train_loader, optimizer, epoch)
         torch.cuda.empty_cache()
         valid(model, device, valid_loader)
         scheduler.step()
         if args.save_model:
-            torch.save(model.state_dict(), "VideoFake_cnn.pt")
+            torch.save(model.state_dict(), "VideoFake_cnn-{}.pt".format(epoch))
             print("------- [Save Model] ----------")
         shuffle.split_train_valid(epoch % 5)
 

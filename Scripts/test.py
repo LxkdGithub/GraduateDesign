@@ -12,8 +12,17 @@ def isTrue(a):
     return 0
 
 def t1():
-    img = cv2.imread("../images/train/forged/00001-000136.png")
-    cv2.imwrite("136.bmp", img)
+    img1 = cv2.imread("../images/train/forged/00001-000136.png")
+    img2 = cv2.imread("../images/train/forged/00001-000137.png")
+    delta1 = cv2.subtract(img1, img2)
+    img3 = cv2.imread("../images/train/prist/00001-000136.png")
+    img4 = cv2.imread("../images/train/prist/00001-000137.png")
+    delta2 = cv2.subtract(img3, img4)
+    # cv2.imshow("img1", img1)
+    # cv2.imshow("img2", img2)
+    cv2.imshow("delta1", delta1)
+    cv2.imshow("delta2", delta2)
+    cv2.waitKey(0)
 
 
 
@@ -29,9 +38,10 @@ def dropout(X, drop_prob):
 
 
 if __name__ == "__main__":
-    t2()
-    d = torch.nn.Dropout()
-    x = torch.rand((2, 4))
-    d()
+    t1()
+    # t2()
+    # d = torch.nn.Dropout()
+    # x = torch.rand((2, 4))
+    # d()
 
 

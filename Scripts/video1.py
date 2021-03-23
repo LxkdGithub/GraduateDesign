@@ -1,7 +1,6 @@
 import os
 import time
 import cv2
-import multiprocessing as mp
 
 
 # convert prist video to images
@@ -27,7 +26,7 @@ def process_video(video_path, output):
 
 
 # extract forged images from forged video (skip the sequence which are not forged)
-def extract_forge_img(video_path, output):
+def extract_forge_img(video_path, output, video_idx):
     if not os.path.exists(video_path):
         print("Forged Video path is not exists")
         print(video_path)
@@ -53,10 +52,32 @@ def extract_forge_img(video_path, output):
     while ret:
         if (idxs[0] <= proc_frames <= idxs[1]) or (idxs[2] <= proc_frames <= idxs[3]):
             output_file = output + "/" + str(video_id) + "-{:0>6d}.png".format(proc_frames)
-            cv2.imwrite(output_file, frame)
+            # cv2.imwrite(output_file, frame)
         ret, frame = vid.read()
         proc_frames += 1
     vid.release()
+
+    if video_idx < 14:
+        if not os.path.exists(output.replace("forged", "prist")):
+            os.makedirs(output.replace("forged", "prist"))
+        prist_video_path = video_path.replace("forged", "prist")
+        prist_video_path = os.path.split(prist_video_path)[0] + "/" + str(video_id) + ".mp4"
+        prist_output = output.replace("forged", "prist")
+        print(prist_video_path)
+        print(prist_output)
+        print(idxs)
+
+        vid = cv2.VideoCapture(prist_video_path)
+        ret, frame = vid.read()
+        proc_frames = 0
+        while ret:
+            if (idxs[0] <= proc_frames <= idxs[1]) or (idxs[2] <= proc_frames <= idxs[3]):
+                output_file = prist_output + "/" + str(video_id) + "-{:0>6d}.png".format(proc_frames)
+                print(output_file)
+                # cv2.imwrite(output_file, frame)
+            ret, frame = vid.read()
+            proc_frames += 1
+        vid.release()
 
 
 def all_split():
@@ -72,18 +93,19 @@ def all_split():
         print("--- processing : {}".format(i))
         if i < 50:
             print("=======", videos[i], videos_forged[i])
-            process_video(prist_dir + "/" + videos[i], output_dir + "/train/prist")
-            extract_forge_img(forged_dir + "/" + videos_forged[i], output_dir + "/train/forged")
+            extract_forge_img(forged_dir + "/" + videos_forged[i], output_dir + "/train/forged", i)
+            if i >= 14:
+                process_video(prist_dir + "/" + videos[i], output_dir + "/train/prist")
+
         else:
             print("=======", videos[i], videos_forged[i])
-            process_video(prist_dir + "/" + videos[i], output_dir + "/test/prist")
-            extract_forge_img(forged_dir + "/" + videos_forged[i], output_dir + "/test/forged")
+            # process_video(prist_dir + "/" + videos[i], output_dir + "/test/prist")
+            # extract_forge_img(forged_dir + "/" + videos_forged[i], output_dir + "/test/forged")
         i += 1
 
 
 if __name__ == "__main__":
     start_time = time.time()
-
     # parser = argparse.ArgumentParser()
     # parser.add_argument("--input1", default="../SYSU/prist/00001.mp4", type=str)
     # parser.add_argument("--input2", default="../SYSU/forged/00001_136-262.mp4", type=str)
@@ -91,9 +113,7 @@ if __name__ == "__main__":
     # args = parser.parse_args()
     # process_video(args.input1, args.output+"/train/prist")
     # extract_forge_img(args.input2, args.output+"/train/forged")
-
     all_split()
-
     print(
         "------------Time taken:{}------------".format(time.time() - start_time)
     )
